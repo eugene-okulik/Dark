@@ -10,6 +10,10 @@ OBJECT_DATA = {
     "name": "test_name",
     "data": {"test": "test_data"}
 }
+UPD_OBJECT_DATA = {
+    "name": "Teat Name",
+    "data": {"Test": "Test Data"}
+}
 THREE_OBJECT_DATA = [
     {
         "name": "test_name1",
@@ -28,35 +32,26 @@ THREE_OBJECT_DATA = [
 
 # Tests
 @pytest.mark.critical
-def test_get_all_objects(get_all_objects, print_log):
+def test_get_all_objects():
     """
-    Test retrieving all objects from the API.
-
-    This test verifies that the API successfully returns a list of all objects.
-
-    :param get_all_objects: Fixture that fetches all objects.
-    :param print_log: Fixture that prints log messages before and after the
-    test.
+    Verify that all objects can be retrieved from the API.
+    The test sends a GET request and asserts the response status code.
     """
-    print("before test")
-    assert get_all_objects.status_code == 200
-    print("after test")
+    response = requests.get(BASE_URL)
+    assert response.status_code == 200
 
 
 @pytest.mark.medium
 @pytest.mark.parametrize("object_data", THREE_OBJECT_DATA)
-def test_create_object(object_data, print_log):
+def test_create_object(object_data):
     """
-    Test creating an object with different data sets.
+    Verify that an object can be successfully created.
 
-    This test sends a POST request to create an object and verifies
-    the response status and returned data.
+    The test sends a POST request with different data sets and checks
+    the response status, object attributes, and ID assignment.
 
-    :param object_data: A dictionary containing object data (parametrized).
-    :param print_log: Fixture that prints log messages before and after the
-    test.
+    :param object_data: Dictionary containing the object data (parametrized).
     """
-    print("before test")
     # Create object
     response = requests.post(BASE_URL, json=object_data)
     response_data = response.json()
@@ -64,30 +59,25 @@ def test_create_object(object_data, print_log):
     # Assertions
     assert response.status_code == 200
     assert response_data["name"] == object_data["name"]
+    assert response_data["data"] == object_data["data"]
     assert "id" in response_data
-    assert "data" in response_data
 
     # Cleanup
     requests.delete(f"{BASE_URL}/{response_data['id']}")
-    print("after test")
 
 
-def test_retrieve_object_by_id(get_id_of_new_object, print_log):
+def test_retrieve_object_by_id(get_id_of_new_object):
     """
-    Test retrieving an object by its ID.
+    Verify that an object can be retrieved by its ID.
 
-    This test verifies that an object can be retrieved by its ID and
-    checks that the returned data matches the created object.
+    The test first creates an object, retrieves it by ID, and checks that
+    the response data matches the original object.
 
-    :param get_id_of_new_object: Fixture that creates a new object and yields
-    its response data.
-    :param print_log: Fixture that prints log messages before and after the
-    test.
+    :param get_id_of_new_object: Fixture that returns the ID of a newly
+    created object.
     """
-    print("before test")
     # Create new object and get its id
-    response, response_data = get_id_of_new_object
-    object_id = response_data["id"]
+    object_id = get_id_of_new_object
 
     # Get object by ID
     response, response_data = get_object_by_id(
@@ -98,92 +88,78 @@ def test_retrieve_object_by_id(get_id_of_new_object, print_log):
     # Assertions
     assert response.status_code == 200
     assert response_data["id"] == object_id
-    assert "name" in response_data
-    assert "data" in response_data
-    print("after test")
 
 
-def test_update_object_with_put_method(get_id_of_new_object, print_log):
+def test_update_object_with_put_method(get_id_of_new_object):
     """
-    Test updating an object using the PUT method.
+    Verify that an object can be fully updated using the PUT method.
 
-    This test updates an existing object by sending a PUT request and
-    verifies that the changes are correctly applied.
+    The test modifies an existing object with a PUT request and checks
+    if the changes are correctly applied in the response.
 
-    :param get_id_of_new_object: Fixture that creates a new object and yields
-    its response data.
-    :param print_log: Fixture that prints log messages before and after the
-    test.
+    :param get_id_of_new_object: Fixture that returns the ID of a newly
+    created object.
     """
-    print("before test")
     # Create new object
-    _, new_object_body = get_id_of_new_object
+    object_id = get_id_of_new_object
 
     # Modify created object
-    new_object_body["name"] = "test_name"
+    new_payload = UPD_OBJECT_DATA
     response, response_data = update_object(
         url=BASE_URL,
-        object_id=new_object_body["id"],
-        payload=new_object_body,
+        object_id=object_id,
+        payload=new_payload,
         method="PUT"
     )
 
     # Assertions
     assert response.status_code == 200
-    assert response_data["name"] == new_object_body["name"]
-    assert int(response_data["id"]) == new_object_body["id"]
-    print("after test")
+    assert response_data["id"] == object_id
+    assert response_data["name"] == new_payload["name"]
+    assert response_data["data"] == new_payload["data"]
 
 
-def test_update_object_with_patch_method(get_id_of_new_object, print_log):
+def test_update_object_with_patch_method(get_id_of_new_object):
     """
-    Test updating an object using the PATCH method.
+    Verify that an object can be partially updated using the PATCH method.
 
-    This test partially updates an existing object and verifies the
-    response reflects the changes.
+    The test sends a PATCH request with a modified payload and verifies
+    that the response reflects the applied changes.
 
-    :param get_id_of_new_object: Fixture that creates a new object and yields
-    its response data.
-    :param print_log: Fixture that prints log messages before and after the
-    test.
+    :param get_id_of_new_object: Fixture that returns the ID of a newly
+    created object.
     """
-    print("before test")
     # Create new object
-    _, new_object_body = get_id_of_new_object
+    object_id = get_id_of_new_object
 
     # Modify created object
-    new_object_body["name"] = "test_name"
-    new_payload = {"name": "test_name"}
+    new_payload = UPD_OBJECT_DATA
     response, response_data = update_object(
         url=BASE_URL,
-        object_id=new_object_body["id"],
+        object_id=object_id,
         payload=new_payload,
         method="PATCH"
     )
 
     # Assertions
     assert response.status_code == 200
+    assert response_data["id"] == object_id
     assert response_data["name"] == new_payload["name"]
-    assert response_data["id"] == new_object_body["id"]
-    print("after test")
+    assert response_data["data"] == new_payload["data"]
 
 
-def test_delete_object(get_id_of_new_object, print_log):
+def test_delete_object(get_id_of_new_object):
     """
-    Test deleting an object by its ID.
+    Verify that an object can be successfully deleted by its ID.
 
-    This test sends a DELETE request to remove an object and verifies
-    the success of the operation through the response.
+    The test creates an object, deletes it, and checks if the response
+    confirms the deletion.
 
-    :param get_id_of_new_object: Fixture that creates a new object and yields
-    its response data.
-    :param print_log: Fixture that prints log messages before and after the
-    test.
+    :param get_id_of_new_object: Fixture that returns the ID of a newly
+    created object.
     """
-    print("before test")
     # Create new object ant get its ID
-    _, response_data = get_id_of_new_object
-    object_id = response_data["id"]
+    object_id = get_id_of_new_object
 
     # Delete object
     response = requests.delete(f"{BASE_URL}/{object_id}")
@@ -191,4 +167,3 @@ def test_delete_object(get_id_of_new_object, print_log):
     # Assertions
     assert response.status_code == 200
     assert f"Object with id {object_id} successfully deleted" in response.text
-    print("after test")

@@ -4,47 +4,52 @@ import pytest
 from test_api import BASE_URL, OBJECT_DATA
 
 
-@pytest.fixture(scope="session")
-def print_log() -> None:
+@pytest.fixture(scope="session", autouse=True)
+def print_start_and_end_testing_session() -> None:
     """
-    Print a log message before and after testing.
+    Print log messages at the start and end of the test session.
 
-    This fixture prints "Start testing" before the session begins
-    and "Testing completed" after all tests are done.
+    This fixture runs once per test session:
+    - Prints "Start testing" before tests begin.
+    - Prints "Testing completed" after all tests finish.
     """
     print("Start testing")
     yield
     print("Testing completed")
 
 
+@pytest.fixture(scope="function", autouse=True)
+def print_start_and_end_test() -> None:
+    """
+    Print log messages before and after each test function.
+
+    This fixture runs before and after every test function:
+    - Prints "before test" at the start.
+    - Prints "after test" at the end.
+    """
+    print("before test")
+    yield
+    print("after test")
+
+
 @pytest.fixture(scope="function")
-def get_all_objects() -> requests.Response:
+def get_id_of_new_object() -> int:
     """
-    Fetch all objects from the API.
-
-    :return: The Response object from the GET request.
-    """
-    return requests.get(BASE_URL)
-
-
-@pytest.fixture(scope="function")
-def get_id_of_new_object() -> tuple[requests.Response, dict]:
-    """
-    Create a new object, yield its response data, and clean up after the test.
+    Create a new object, yield its ID, and delete it after the test.
 
     This fixture:
-    - Creates a new object via a POST request.
-    - Yields a tuple containing:
-        - The Response object from the POST request.
-        - A dictionary with the parsed JSON response containing object data.
-    - Deletes the created object after the test.
+    - Sends a POST request to create a new object.
+    - Yields the object's ID.
+    - Sends a DELETE request to remove the object after the test.
+
+    :return: The ID of the created object.
     """
     # New object creation
     response = requests.post(BASE_URL, json=OBJECT_DATA)
     response_data = response.json()
 
     # Yield ID
-    yield response, response_data
+    yield response_data["id"]
 
     # Cleanup
     requests.delete(f"{BASE_URL}/{response_data['id']}")

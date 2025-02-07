@@ -1,7 +1,10 @@
 import requests
 
 
-def get_object_by_id(url: str, object_id: int) -> tuple[requests.Response, dict]:
+def get_object_by_id(
+        url: str,
+        object_id: int
+) -> tuple[requests.Response, dict]:
     """
     Fetch a specific object by its ID.
 
