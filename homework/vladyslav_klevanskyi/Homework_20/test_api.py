@@ -203,6 +203,5 @@ def test_delete_object(get_id_of_new_object):
     with allure.step("Check response code is 200"):
         assert response.status_code == 200
     with allure.step("Check response message"):
-        assert (
-                   f"Object with id {object_id} successfully deleted"
-               ) in response.text
+        assert (f"Object with id"
+                f" {object_id} successfully deleted") in response.text
