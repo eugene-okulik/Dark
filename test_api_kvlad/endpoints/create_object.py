@@ -18,11 +18,3 @@ class CreateObject(Endpoint):
             self.body = self.response.json()
             self.object_id = self.body['id']
         self.response_text = self.response.text
-
-    @allure.step("Delete new object")
-    def delete_new_object(self, headers=None):
-        headers = headers if headers else self.headers
-        self.response = requests.delete(
-            url=f"{self.url}/{self.object_id}",
-            headers=headers
-        )

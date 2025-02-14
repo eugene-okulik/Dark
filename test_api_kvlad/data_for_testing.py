@@ -21,7 +21,10 @@ UPD_OBJECT_DATA = get_object_data()
 OBJECTS_DATA = [get_object_data() for _ in range(5)]
 
 MESSAGES = {
-    "invalid object creation": "Invalid parameters"
+    "invalid parameters": "Invalid parameters",
+    "invalid id": "The requested URL was not found on the server."
+                  " If you entered the URL manually please check your "
+                  "spelling and try again."
 }
 
 INVALID_DATA = [

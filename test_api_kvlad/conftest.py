@@ -17,7 +17,7 @@ def retrieve_objects_endpoint():
 def create_object_endpoint():
     new_object = CreateObject()
     yield new_object
-    new_object.delete_new_object()
+    new_object.delete_object_by_id(new_object.object_id)
 
 
 @pytest.fixture(scope="function")
@@ -57,4 +57,4 @@ def create_few_objects():
         new_objects.append(new_object)
     yield len(new_objects)
     for new_object in new_objects:
-        new_object.delete_new_object()
+        new_object.delete_object_by_id(new_object.object_id)

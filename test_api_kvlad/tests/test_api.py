@@ -7,7 +7,8 @@ from test_api_kvlad.data_for_testing import (
     UPD_OBJECT_DATA,
     INVALID_DATA,
     PATCH_DATA,
-    INVALID_PATCH_DATA
+    INVALID_PATCH_DATA,
+    MESSAGES
 )
 
 
@@ -17,7 +18,7 @@ from test_api_kvlad.data_for_testing import (
 def test_get_all_objects(create_few_objects, retrieve_objects_endpoint):
     retrieve_objects_endpoint.retrieve_all_objects()
     # Assertions
-    retrieve_objects_endpoint.check_that_status_is_200()
+    retrieve_objects_endpoint.check_that_status_is(200)
     retrieve_objects_endpoint.check_retrieved_objects_not_less_than_created()
 
 
@@ -28,10 +29,10 @@ def test_get_all_objects(create_few_objects, retrieve_objects_endpoint):
 def test_create_object(create_object_endpoint, object_data):
     create_object_endpoint.create_new_object(payload=object_data)
     # Assertions
-    create_object_endpoint.check_that_status_is_200()
+    create_object_endpoint.check_that_status_is(200)
     create_object_endpoint.check_response_name_is_correct(object_data["name"])
     create_object_endpoint.check_response_data_is_correct(object_data["data"])
-    create_object_endpoint.check_that_id_field_in_response_data()
+    create_object_endpoint.check_that_the_field_is_in_response(field="id")
 
 
 @allure.feature("Negative")
@@ -45,8 +46,10 @@ def test_create_object(create_object_endpoint, object_data):
 def test_create_object_with_invalid_data(create_object_endpoint, object_data):
     create_object_endpoint.create_new_object(payload=object_data)
     # Assertions
-    create_object_endpoint.check_that_status_is_400()
-    create_object_endpoint.check_invalid_response_message()
+    create_object_endpoint.check_that_status_is(400)
+    create_object_endpoint.check_error_response_message(
+        expected_message=MESSAGES["invalid parameters"]
+    )
 
 
 @allure.feature("Positive")
@@ -57,10 +60,10 @@ def test_retrieve_object_by_id(retrieve_object_endpoint, get_id_of_new_object):
         object_id=get_id_of_new_object
     )
     # Assertions
-    retrieve_object_endpoint.check_that_status_is_200()
+    retrieve_object_endpoint.check_that_status_is(200)
     retrieve_object_endpoint.check_response_id_is_correct(get_id_of_new_object)
-    retrieve_object_endpoint.check_that_name_field_in_response_data()
-    retrieve_object_endpoint.check_that_data_field_in_response_data()
+    retrieve_object_endpoint.check_that_the_field_is_in_response(field="name")
+    retrieve_object_endpoint.check_that_the_field_is_in_response(field="data")
 
 
 @allure.feature("Negative")
@@ -74,10 +77,10 @@ def test_retrieve_object_by_incorrect_id(
         object_id=get_non_existent_id
     )
     # Assertions
-    retrieve_object_endpoint.check_that_status_is_404()
-    retrieve_object_endpoint.check_invalid_message_response()
-    # retrieve_object_endpoint.check_that_name_field_in_response_data()
-    # retrieve_object_endpoint.check_that_data_field_in_response_data()
+    retrieve_object_endpoint.check_that_status_is(404)
+    retrieve_object_endpoint.check_error_response_message(
+        expected_message=MESSAGES["invalid id"]
+    )
 
 
 @allure.feature("Positive")
@@ -92,7 +95,7 @@ def test_update_object_with_put_method(
         object_id=get_id_of_new_object
     )
     # Assertions
-    update_object_endpoint.check_that_status_is_200()
+    update_object_endpoint.check_that_status_is(200)
     update_object_endpoint.check_response_id_is_correct(get_id_of_new_object)
     update_object_endpoint.check_response_name_is_correct(
         UPD_OBJECT_DATA["name"]
@@ -120,8 +123,10 @@ def test_update_object_with_put_method_and_invalid_parameters(
         object_id=get_id_of_new_object
     )
     # Assertions
-    update_object_endpoint.check_that_status_is_400()
-    update_object_endpoint.check_invalid_response_message()
+    update_object_endpoint.check_that_status_is(400)
+    update_object_endpoint.check_error_response_message(
+        expected_message=MESSAGES["invalid parameters"]
+    )
 
 
 @allure.feature("Positive")
@@ -142,7 +147,7 @@ def test_update_object_with_patch_method(
         object_id=get_id_of_new_object
     )
     # Assertions
-    update_object_endpoint.check_that_status_is_200()
+    update_object_endpoint.check_that_status_is(200)
     update_object_endpoint.check_response_id_is_correct(get_id_of_new_object)
     # Check fields when 'name' was updated
     if update_object_data.get("name"):
@@ -180,8 +185,10 @@ def test_update_object_with_patch_method_and_invalid_parameters(
         object_id=get_id_of_new_object
     )
     # Assertions
-    update_object_endpoint.check_that_status_is_400()
-    update_object_endpoint.check_invalid_response_message()
+    update_object_endpoint.check_that_status_is(400)
+    update_object_endpoint.check_error_response_message(
+        expected_message=MESSAGES["invalid parameters"]
+    )
 
 
 @allure.feature("Positive")
@@ -190,7 +197,7 @@ def test_update_object_with_patch_method_and_invalid_parameters(
 def test_delete_object(delete_object_endpoint, get_id_of_new_object):
     delete_object_endpoint.delete_object_by_id(object_id=get_id_of_new_object)
     # Assertions
-    delete_object_endpoint.check_that_status_is_200()
+    delete_object_endpoint.check_that_status_is(200)
     delete_object_endpoint.check_response_message_is_correct(
         get_id_of_new_object
     )
