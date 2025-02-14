@@ -10,7 +10,10 @@ class RetrieveAllObjects(Endpoint):
     @allure.step("Retrieve all objects")
     def retrieve_all_objects(self):
         self.response = requests.get(self.url)
-        self.body = self.response.json()
+        if self.response.status_code == 200:
+            self.body = self.response.json()
+            return self.body
+        self.response_text = self.response.text
 
     @allure.step(
         "Check that the received objects are not less than the created ones"

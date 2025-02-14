@@ -42,6 +42,12 @@ def get_id_of_new_object(create_object_endpoint):
     return create_object_endpoint.object_id
 
 
+@pytest.fixture(scope="function")
+def get_non_existent_id(create_few_objects, retrieve_objects_endpoint):
+    all_objects = retrieve_objects_endpoint.retrieve_all_objects()
+    return max(obj["id"] for obj in all_objects["data"]) + 11241
+
+
 @pytest.fixture(scope="session")
 def create_few_objects():
     new_objects = []

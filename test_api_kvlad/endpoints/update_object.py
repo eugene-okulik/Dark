@@ -14,14 +14,23 @@ class UpdateObject(Endpoint):
             json=payload,
             headers=headers
         )
-        self.body = self.response.json()
+        if self.response.status_code == 200:
+            self.body = self.response.json()
+        self.response_text = self.response.text
 
     @allure.step("Update an object with PATCH method")
-    def update_object_with_patch_method(self, object_id, payload, headers=None):
+    def update_object_with_patch_method(
+            self,
+            object_id,
+            payload,
+            headers=None
+    ):
         headers = headers if headers else self.headers
         self.response = requests.patch(
             url=f"{self.url}/{object_id}",
             json=payload,
             headers=headers
         )
-        self.body = self.response.json()
+        if self.response.status_code == 200:
+            self.body = self.response.json()
+        self.response_text = self.response.text
