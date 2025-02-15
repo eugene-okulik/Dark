@@ -43,8 +43,3 @@ class Endpoint:
         assert expected_message in self.response_text, \
             (f"Expected message: {expected_message},"
              f" Actual message: {self.response_text}")
-
-    @allure.step("Delete object by ID")
-    def delete_object_by_id(self, object_id):
-        self.response = requests.delete(f"{self.url}/{object_id}")
-        self.response_text = self.response.text

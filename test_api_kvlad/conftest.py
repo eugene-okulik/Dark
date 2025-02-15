@@ -14,10 +14,10 @@ def retrieve_objects_endpoint():
 
 
 @pytest.fixture(scope="function")
-def create_object_endpoint():
+def create_object_endpoint(delete_object_endpoint):
     new_object = CreateObject()
     yield new_object
-    new_object.delete_object_by_id(new_object.object_id)
+    delete_object_endpoint.delete_object_by_id(new_object.object_id)
 
 
 @pytest.fixture(scope="function")
@@ -45,11 +45,11 @@ def get_id_of_new_object(create_object_endpoint):
 @pytest.fixture(scope="function")
 def get_non_existent_id(create_few_objects, retrieve_objects_endpoint):
     all_objects = retrieve_objects_endpoint.retrieve_all_objects()
-    return max(obj["id"] for obj in all_objects["data"]) + 11241
+    return max(int(obj["id"]) for obj in all_objects["data"]) + 11241
 
 
-@pytest.fixture(scope="session")
-def create_few_objects():
+@pytest.fixture(scope="function")
+def create_few_objects(delete_object_endpoint):
     new_objects = []
     for object_data in OBJECTS_DATA:
         new_object = CreateObject()
@@ -57,4 +57,4 @@ def create_few_objects():
         new_objects.append(new_object)
     yield len(new_objects)
     for new_object in new_objects:
-        new_object.delete_object_by_id(new_object.object_id)
+        delete_object_endpoint.delete_object_by_id(new_object.object_id)
