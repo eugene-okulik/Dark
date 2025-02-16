@@ -14,10 +14,8 @@ def retrieve_objects_endpoint():
 
 
 @pytest.fixture(scope="function")
-def create_object_endpoint(delete_object_endpoint):
-    new_object = CreateObject()
-    yield new_object
-    delete_object_endpoint.delete_object_by_id(new_object.object_id)
+def create_object_endpoint():
+    return CreateObject()
 
 
 @pytest.fixture(scope="function")
@@ -36,7 +34,7 @@ def delete_object_endpoint():
 
 
 @pytest.fixture(scope="function")
-def get_id_of_new_object(create_object_endpoint):
+def id_of_new_object(create_object_endpoint):
     payload = OBJECT_DATA
     create_object_endpoint.create_new_object(payload=payload)
     return create_object_endpoint.object_id
@@ -58,3 +56,13 @@ def create_few_objects(delete_object_endpoint):
     yield len(new_objects)
     for new_object in new_objects:
         delete_object_endpoint.delete_object_by_id(new_object.object_id)
+
+
+@pytest.fixture(autouse=True)
+def cleanup(request, create_object_endpoint, delete_object_endpoint):
+
+    def delete_object():
+        object_id = create_object_endpoint.object_id
+        delete_object_endpoint.delete_object_by_id(object_id)
+
+    request.addfinalizer(delete_object)

@@ -55,13 +55,13 @@ def test_create_object_with_invalid_data(create_object_endpoint, object_data):
 @allure.feature("Positive")
 @allure.title("Retrieve object by ID")
 @pytest.mark.critical
-def test_retrieve_object_by_id(retrieve_object_endpoint, get_id_of_new_object):
+def test_retrieve_object_by_id(retrieve_object_endpoint, id_of_new_object):
     retrieve_object_endpoint.retrieve_object_by_id(
-        object_id=get_id_of_new_object
+        object_id=id_of_new_object
     )
     # Assertions
     retrieve_object_endpoint.check_that_status_is(200)
-    retrieve_object_endpoint.check_response_id_is_correct(get_id_of_new_object)
+    retrieve_object_endpoint.check_response_id_is_correct(id_of_new_object)
     retrieve_object_endpoint.check_that_the_field_is_in_response(field="name")
     retrieve_object_endpoint.check_that_the_field_is_in_response(field="data")
 
@@ -88,15 +88,15 @@ def test_retrieve_object_by_incorrect_id(
 @pytest.mark.medium
 def test_update_object_with_put_method(
         update_object_endpoint,
-        get_id_of_new_object
+        id_of_new_object
 ):
     update_object_endpoint.update_object_with_put_method(
         payload=UPD_OBJECT_DATA,
-        object_id=get_id_of_new_object
+        object_id=id_of_new_object
     )
     # Assertions
     update_object_endpoint.check_that_status_is(200)
-    update_object_endpoint.check_response_id_is_correct(get_id_of_new_object)
+    update_object_endpoint.check_response_id_is_correct(id_of_new_object)
     update_object_endpoint.check_response_name_is_correct(
         UPD_OBJECT_DATA["name"]
     )
@@ -115,12 +115,12 @@ def test_update_object_with_put_method(
 )
 def test_update_object_with_put_method_and_invalid_parameters(
         update_object_endpoint,
-        get_id_of_new_object,
+        id_of_new_object,
         update_object_data
 ):
     update_object_endpoint.update_object_with_put_method(
         payload=update_object_data,
-        object_id=get_id_of_new_object
+        object_id=id_of_new_object
     )
     # Assertions
     update_object_endpoint.check_that_status_is(400)
@@ -139,16 +139,16 @@ def test_update_object_with_put_method_and_invalid_parameters(
 )
 def test_update_object_with_patch_method(
         update_object_endpoint,
-        get_id_of_new_object,
+        id_of_new_object,
         update_object_data
 ):
     update_object_endpoint.update_object_with_patch_method(
         payload=update_object_data,
-        object_id=get_id_of_new_object
+        object_id=id_of_new_object
     )
     # Assertions
     update_object_endpoint.check_that_status_is(200)
-    update_object_endpoint.check_response_id_is_correct(get_id_of_new_object)
+    update_object_endpoint.check_response_id_is_correct(id_of_new_object)
     # Check fields when 'name' was updated
     if update_object_data.get("name"):
         update_object_endpoint.check_response_name_is_correct(
@@ -177,12 +177,12 @@ def test_update_object_with_patch_method(
 )
 def test_update_object_with_patch_method_and_invalid_parameters(
         update_object_endpoint,
-        get_id_of_new_object,
+        id_of_new_object,
         update_object_data
 ):
     update_object_endpoint.update_object_with_patch_method(
         payload=update_object_data,
-        object_id=get_id_of_new_object
+        object_id=id_of_new_object
     )
     # Assertions
     update_object_endpoint.check_that_status_is(400)
@@ -194,10 +194,10 @@ def test_update_object_with_patch_method_and_invalid_parameters(
 @allure.feature("Positive")
 @allure.title("Delete object")
 @pytest.mark.low
-def test_delete_object(delete_object_endpoint, get_id_of_new_object):
-    delete_object_endpoint.delete_object_by_id(object_id=get_id_of_new_object)
+def test_delete_object(delete_object_endpoint, id_of_new_object):
+    delete_object_endpoint.delete_object_by_id(object_id=id_of_new_object)
     # Assertions
     delete_object_endpoint.check_that_status_is(200)
     delete_object_endpoint.check_response_message_is_correct(
-        get_id_of_new_object
+        id_of_new_object
     )
